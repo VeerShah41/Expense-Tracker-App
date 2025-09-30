@@ -10,6 +10,10 @@ import Visualize from './src/screens/tabs/Visualize';
 import SettingsScreen from './src/screens/SettingScreen';
 import Profile from './src/screens/Profile';
 
+
+import { ExpenseProvider } from "./src/storage/ExpenseContext";
+
+
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -51,6 +55,7 @@ function MyTabs() {
 // Drawer without route checks
 export default function App() {
   return (
+    <ExpenseProvider>
     <NavigationContainer>
       <Drawer.Navigator
         screenOptions={{
@@ -73,14 +78,15 @@ export default function App() {
             drawerIcon: ({ color, size }) => <Icon name="user" size={size} color={color} solid />
           }}
         />
-        <Drawer.Screen 
+        {/* <Drawer.Screen 
           name="Settings" 
           component={SettingsScreen} 
           options={{
             drawerIcon: ({ color, size }) => <Icon name="cog" size={size} color={color} solid />
           }}
-        />
+        /> */}
       </Drawer.Navigator>
     </NavigationContainer>
+    </ExpenseProvider>
   );
 }

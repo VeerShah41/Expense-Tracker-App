@@ -7,7 +7,7 @@ export default function Profile() {
 
   // Static user info (can later make dynamic)
   const user = {
-    name: "Persolan",
+    name: "Personal",
     email: "personal123@example.com",
   };
 

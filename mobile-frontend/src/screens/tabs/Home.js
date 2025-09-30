@@ -49,7 +49,7 @@ export default function Home() {
     return (
       <View style={styles.container}>
         <TouchableOpacity onPress={() => setSelectedRoom(null)} style={styles.backBtn}>
-          <Text style={styles.backText}>⬅ Back</Text>
+          <Text style={styles.backText}>  {"<-  Back"}</Text>
         </TouchableOpacity>
 
         <Text style={styles.title}>{selectedRoom} Expenses</Text>
@@ -64,27 +64,29 @@ export default function Home() {
             renderItem={({ item }) => (
               <View style={styles.expenseItem}>
                 {editExpenseId === item.id ? (
-                  <>
-                    <TextInput
-                      style={styles.editInput}
-                      value={editAmount}
-                      keyboardType="numeric"
-                      onChangeText={setEditAmount}
-                      placeholder="Amount"
-                    />
-                    <TextInput
-                      style={styles.editInput}
-                      value={editDescription}
-                      onChangeText={setEditDescription}
-                      placeholder="Description"
-                    />
+                  <View style={styles.editRow}>
+                    <View style={{ flex: 1, marginRight: 10 }}>
+                      <TextInput
+                        style={styles.editInput}
+                        value={editAmount}
+                        keyboardType="numeric"
+                        onChangeText={setEditAmount}
+                        placeholder="Amount"
+                      />
+                      <TextInput
+                        style={styles.editInput}
+                        value={editDescription}
+                        onChangeText={setEditDescription}
+                        placeholder="Description"
+                      />
+                    </View>
                     <TouchableOpacity style={styles.saveBtn} onPress={handleEditSubmit}>
                       <Text style={{ color: "#fff" }}>Save</Text>
                     </TouchableOpacity>
-                  </>
+                  </View>
                 ) : (
-                  <>
-                    <Text>{item.description} - ₹{item.amount}</Text>
+                  <View style={styles.expenseRow}>
+                    <Text style={{ flex: 1 }}>{item.description} - ₹{item.amount}</Text>
                     <View style={styles.actionBtns}>
                       <TouchableOpacity
                         style={styles.editBtn}
@@ -103,11 +105,12 @@ export default function Home() {
                         <Text style={{ color: "#fff" }}>Delete</Text>
                       </TouchableOpacity>
                     </View>
-                  </>
+                  </View>
                 )}
               </View>
             )}
           />
+
         )}
       </View>
     );
@@ -116,6 +119,7 @@ export default function Home() {
   // Render Home with monthly chart
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.chartContainer}>
       <Text style={styles.title}>Monthly Expenses</Text>
       {expenses.length === 0 ? (
         <Text style={{ color: "#777", marginBottom: 20 }}>No expenses to visualize.</Text>
@@ -141,13 +145,15 @@ export default function Home() {
           style={{ marginVertical: 8, borderRadius: 16 }}
         />
       )}
-
+      </View>
+      <View style={styles.overallTotalContainer}>
       <Text style={styles.title}>Overall Total Expense</Text>
       <Text style={styles.total}>₹ {getOverallTotal().toFixed(2)}</Text>
-
-      <Text style={styles.subTitle}>Rooms</Text>
+      </View>
+      <View>
+      <Text style={styles.subTitle}>Category</Text>
       {Object.keys(rooms).length === 0 ? (
-        <Text style={{ color: "#777" }}>No rooms yet.</Text>
+        <Text style={{ color: "#777" }}>No Category yet.</Text>
       ) : (
         Object.keys(rooms).map((room) => (
           <TouchableOpacity key={room} style={styles.roomCard} onPress={() => setSelectedRoom(room)}>
@@ -156,57 +162,152 @@ export default function Home() {
           </TouchableOpacity>
         ))
       )}
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
-  subTitle: { fontSize: 18, fontWeight: "600", marginTop: 20, marginBottom: 10 },
-  total: { fontSize: 20, fontWeight: "600", marginBottom: 20 },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f2f4f7", // light theme background
+  },
+
+  // Titles
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#111",
+  },
+  subTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#333",
+  },
+
+  // Totals
+  total: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 20,
+    color: "#007bff",
+  },
+
+  // Room / Category Card
   roomCard: {
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 15,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: "#ffffff", // card bg
+    borderRadius: 12,
+    marginBottom: 12,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
+    elevation: 3, // Android shadow
   },
-  roomName: { fontSize: 16, fontWeight: "600" },
-  roomTotal: { fontSize: 16, color: "#333" },
+  roomName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#222",
+  },
+  roomTotal: {
+    fontSize: 16,
+    color: "#555",
+  },
+
+  // Expense Item Card
   expenseItem: {
-    padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    padding: 12,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
     marginBottom: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
+    flexDirection: "column", // default
   },
-  actionBtns: { flexDirection: "row", marginTop: 5 },
-  editBtn: { backgroundColor: "#007bff", padding: 5, borderRadius: 5, marginRight: 10 },
-  deleteBtn: { backgroundColor: "#ff4d4d", padding: 5, borderRadius: 5 },
-  backBtn: { marginBottom: 10 },
-  backText: { color: "#007bff", fontSize: 16 },
+  expenseRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  editRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  actionBtns: {
+    flexDirection: "row",
+    marginTop: 5,
+  },
+  editBtn: {
+    backgroundColor: "#007bff",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  deleteBtn: {
+    backgroundColor: "#ff4d4d",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+
+  backBtn: {
+    marginBottom: 12,
+  },
+  backText: {
+    color: "#007bff",
+    fontSize: 16,
+  },
+
   editInput: {
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 8,
-    borderRadius: 5,
-    marginBottom: 5,
-    backgroundColor: "#f5f5f5",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: "#f9f9f9",
   },
   saveBtn: {
     backgroundColor: "#28a745",
-    padding: 8,
-    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
     alignItems: "center",
-    marginTop: 5,
+    justifyContent: "center",
+  },
+
+  chartContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 3,
+  },
+
+  overallTotalContainer: {
+    backgroundColor: "#e8f0fe",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.03,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 2,
   },
 });

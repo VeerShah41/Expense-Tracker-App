@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, ScrollView, Dimensions } from "react-native";
 import { ExpenseContext } from "../../storage/ExpenseContext.js";
+import { LineChart } from "react-native-chart-kit";
 
 export default function Home() {
   const { expenses, rooms, getOverallTotal, getRoomTotal, deleteExpense, addExpense } = useContext(ExpenseContext);
@@ -10,14 +11,20 @@ export default function Home() {
   const [editAmount, setEditAmount] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
+  // Prepare monthly totals
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const monthlyTotals = Array(12).fill(0);
+  expenses.forEach((e) => {
+    const month = new Date(e.date).getMonth();
+    monthlyTotals[month] += e.amount;
+  });
+
   // Handle edit submit
   const handleEditSubmit = () => {
     if (!editAmount) {
       Alert.alert("Error", "Amount is required");
       return;
     }
-
-    // Update the expense: delete old and add new with same id
     const oldExpense = expenses.find((e) => e.id === editExpenseId);
     if (!oldExpense) return;
 
@@ -106,9 +113,35 @@ export default function Home() {
     );
   }
 
-  // Render Home: total + rooms
+  // Render Home with monthly chart
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Monthly Expenses</Text>
+      {expenses.length === 0 ? (
+        <Text style={{ color: "#777", marginBottom: 20 }}>No expenses to visualize.</Text>
+      ) : (
+        <LineChart
+          data={{
+            labels: months,
+            datasets: [{ data: monthlyTotals }]
+          }}
+          width={Dimensions.get("window").width - 40}
+          height={220}
+          yAxisLabel="₹"
+          chartConfig={{
+            backgroundColor: "#f9f9f9",
+            backgroundGradientFrom: "#f9f9f9",
+            backgroundGradientTo: "#f9f9f9",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0,0,0,${opacity})`,
+            style: { borderRadius: 16 },
+            propsForDots: { r: "4", strokeWidth: "2", stroke: "#007bff" }
+          }}
+          style={{ marginVertical: 8, borderRadius: 16 }}
+        />
+      )}
+
       <Text style={styles.title}>Overall Total Expense</Text>
       <Text style={styles.total}>₹ {getOverallTotal().toFixed(2)}</Text>
 
@@ -123,7 +156,7 @@ export default function Home() {
           </TouchableOpacity>
         ))
       )}
-    </View>
+    </ScrollView>
   );
 }
 

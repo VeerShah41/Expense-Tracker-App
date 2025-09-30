@@ -78,13 +78,13 @@ export default function App() {
             drawerIcon: ({ color, size }) => <Icon name="user" size={size} color={color} solid />
           }}
         />
-        {/* <Drawer.Screen 
+        <Drawer.Screen 
           name="Settings" 
           component={SettingsScreen} 
           options={{
             drawerIcon: ({ color, size }) => <Icon name="cog" size={size} color={color} solid />
           }}
-        /> */}
+        />
       </Drawer.Navigator>
     </NavigationContainer>
     </ExpenseProvider>

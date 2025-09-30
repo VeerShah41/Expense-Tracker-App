@@ -1,10 +1,55 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ExpenseContext = createContext();
 
 export const ExpenseProvider = ({ children }) => {
   const [expenses, setExpenses] = useState([]); // all expenses
   const [rooms, setRooms] = useState({}); // { roomName: [expense1, expense2...] }
+
+  // Load expenses from AsyncStorage on mount
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        const storedExpenses = await AsyncStorage.getItem("@expenses");
+        if (storedExpenses) {
+          const parsed = JSON.parse(storedExpenses);
+          setExpenses(parsed);
+
+          // rebuild rooms
+          const newRooms = {};
+          parsed.forEach((e) => {
+            if (!newRooms[e.room]) newRooms[e.room] = [];
+            newRooms[e.room].push(e);
+          });
+          setRooms(newRooms);
+        }
+      } catch (e) {
+        console.error("Failed to load expenses:", e);
+      }
+    };
+    loadExpenses();
+  }, []);
+  // Inside ExpenseProvider
+
+const clearAllExpenses = async () => {
+  try {
+    await AsyncStorage.removeItem("@expenses"); // clear AsyncStorage
+    setExpenses([]); // reset state
+    setRooms({});
+  } catch (e) {
+    console.error("Failed to clear expenses:", e);
+  }
+};
+
+  // Save expenses to AsyncStorage
+  const saveExpenses = async (newExpenses) => {
+    try {
+      await AsyncStorage.setItem("@expenses", JSON.stringify(newExpenses));
+    } catch (e) {
+      console.error("Failed to save expenses:", e);
+    }
+  };
 
   // Add an expense to a specific room
   const addExpense = (room, expense) => {
@@ -14,28 +59,29 @@ export const ExpenseProvider = ({ children }) => {
       ...expense, // amount, description, date
     };
 
-    // add to expenses
-    setExpenses((prev) => [...prev, newExpense]);
+    const newExpenses = [...expenses, newExpense];
+    setExpenses(newExpenses);
 
-    // add to room
     setRooms((prev) => {
       const updatedRoomExpenses = prev[room] ? [...prev[room], newExpense] : [newExpense];
       return { ...prev, [room]: updatedRoomExpenses };
     });
+
+    saveExpenses(newExpenses);
   };
 
   // Delete an expense
   const deleteExpense = (id) => {
-    setExpenses((prev) => prev.filter((e) => e.id !== id));
+    const newExpenses = expenses.filter((e) => e.id !== id);
+    setExpenses(newExpenses);
 
-    // remove from rooms as well
-    setRooms((prev) => {
-      const updatedRooms = {};
-      Object.keys(prev).forEach((room) => {
-        updatedRooms[room] = prev[room].filter((e) => e.id !== id);
-      });
-      return updatedRooms;
+    const updatedRooms = {};
+    Object.keys(rooms).forEach((room) => {
+      updatedRooms[room] = rooms[room].filter((e) => e.id !== id);
     });
+    setRooms(updatedRooms);
+
+    saveExpenses(newExpenses);
   };
 
   // Get overall total
@@ -51,16 +97,18 @@ export const ExpenseProvider = ({ children }) => {
 
   return (
     <ExpenseContext.Provider
-      value={{
-        expenses,
-        rooms,
-        addExpense,
-        deleteExpense,
-        getOverallTotal,
-        getRoomTotal,
-      }}
-    >
-      {children}
-    </ExpenseContext.Provider>
+  value={{
+    expenses,
+    rooms,
+    addExpense,
+    deleteExpense,
+    getOverallTotal,
+    getRoomTotal,
+    clearAllExpenses, // <- add this
+  }}
+>
+  {children}
+</ExpenseContext.Provider>
+
   );
 };

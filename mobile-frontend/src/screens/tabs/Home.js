@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, ScrollView, Dimensions } from "react-native";
 import { ExpenseContext } from "../../storage/ExpenseContext.js";
+
 import { LineChart } from "react-native-chart-kit";
 
 export default function Home() {
@@ -129,7 +130,7 @@ export default function Home() {
             labels: months,
             datasets: [{ data: monthlyTotals }]
           }}
-          width={Dimensions.get("window").width - 40}
+          width={Dimensions.get("window").width - 70}
           height={220}
           yAxisLabel="₹"
           chartConfig={{

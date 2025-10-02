@@ -46,7 +46,7 @@ function MyTabs() {
   );
 }
 
-// Drawer without route checks
+
 export default function App() {
   return (
     <ExpenseProvider>

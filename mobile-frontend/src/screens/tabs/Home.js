@@ -12,7 +12,7 @@ export default function Home() {
   const [editAmount, setEditAmount] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
-  // Prepare monthly totals
+
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const monthlyTotals = Array(12).fill(0);
   expenses.forEach((e) => {
@@ -20,7 +20,7 @@ export default function Home() {
     monthlyTotals[month] += e.amount;
   });
 
-  // Handle edit submit
+
   const handleEditSubmit = () => {
     if (!editAmount) {
       Alert.alert("Error", "Amount is required");
@@ -43,7 +43,7 @@ export default function Home() {
     setEditDescription("");
   };
 
-  // Render room logs
+
   if (selectedRoom) {
     const roomExpenses = rooms[selectedRoom] || [];
 
@@ -117,9 +117,13 @@ export default function Home() {
     );
   }
 
-  // Render Home with monthly chart
+
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.overallTotalContainer}>
+      <Text style={styles.title}>Overall Total Expense</Text>
+      <Text style={styles.total}>₹ {getOverallTotal().toFixed(2)}</Text>
+      </View>
       <View style={styles.chartContainer}>
       <Text style={styles.title}>Monthly Expenses</Text>
       {expenses.length === 0 ? (
@@ -147,23 +151,29 @@ export default function Home() {
         />
       )}
       </View>
-      <View style={styles.overallTotalContainer}>
-      <Text style={styles.title}>Overall Total Expense</Text>
-      <Text style={styles.total}>₹ {getOverallTotal().toFixed(2)}</Text>
-      </View>
+      
       <View>
-      <Text style={styles.subTitle}>Category</Text>
-      {Object.keys(rooms).length === 0 ? (
-        <Text style={{ color: "#777" }}>No Category yet.</Text>
-      ) : (
-        Object.keys(rooms).map((room) => (
-          <TouchableOpacity key={room} style={styles.roomCard} onPress={() => setSelectedRoom(room)}>
-            <Text style={styles.roomName}>{room}</Text>
-            <Text style={styles.roomTotal}>₹ {getRoomTotal(room).toFixed(2)}</Text>
-          </TouchableOpacity>
-        ))
-      )}
+        <Text style={styles.subTitle}>Expanse logs</Text>
+        <Text style={{ color: "#777", fontSize: 12, marginBottom: 8 }}>
+          Tap on a log to edit or delete an expense
+        </Text>
+
+        {Object.keys(rooms).length === 0 ? (
+          <Text style={{ color: "#777" }}>No Category yet.</Text>
+        ) : (
+          Object.keys(rooms).map((room) => (
+            <TouchableOpacity
+              key={room}
+              style={styles.roomCard}
+              onPress={() => setSelectedRoom(room)}
+            >
+              <Text style={styles.roomName}>{room}</Text>
+              <Text style={styles.roomTotal}>₹ {getRoomTotal(room).toFixed(2)}</Text>
+            </TouchableOpacity>
+          ))
+        )}
       </View>
+
     </ScrollView>
   );
 }
@@ -172,10 +182,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f2f4f7", // light theme background
+    backgroundColor: "#f2f4f7",
   },
 
-  // Titles
+
   title: {
     fontSize: 22,
     fontWeight: "bold",
@@ -190,7 +200,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
 
-  // Totals
+
   total: {
     fontSize: 20,
     fontWeight: "600",
@@ -198,19 +208,19 @@ const styles = StyleSheet.create({
     color: "#007bff",
   },
 
-  // Room / Category Card
+
   roomCard: {
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 15,
-    backgroundColor: "#ffffff", // card bg
+    backgroundColor: "#ffffff", 
     borderRadius: 12,
     marginBottom: 12,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
-    elevation: 3, // Android shadow
+    elevation: 3,
   },
   roomName: {
     fontSize: 16,
@@ -222,7 +232,7 @@ const styles = StyleSheet.create({
     color: "#555",
   },
 
-  // Expense Item Card
+
   expenseItem: {
     padding: 12,
     backgroundColor: "#ffffff",
@@ -232,7 +242,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
-    flexDirection: "column", // default
+    flexDirection: "column", 
   },
   expenseRow: {
     flexDirection: "row",

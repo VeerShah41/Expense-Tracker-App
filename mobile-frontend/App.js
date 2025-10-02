@@ -41,13 +41,7 @@ function MyTabs() {
           tabBarIcon: ({ color, size }) => <Icon name="plus-circle" size={size} color={color} solid />
         }}
       />
-      <Tab.Screen 
-        name="Visualize" 
-        component={Visualize} 
-        options={{
-          tabBarIcon: ({ color, size }) => <Icon name="chart-line" size={size} color={color} solid />
-        }}
-      />
+      {/* <Tab.Screen name="Visualize" component={Visualize} options={{tabBarIcon: ({ color, size }) => <Icon name="chart-line" size={size} color={color} solid />}}/> */}
     </Tab.Navigator>
   );
 }
